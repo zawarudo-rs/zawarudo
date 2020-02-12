@@ -12,12 +12,13 @@ table! {
 
 table! {
     blocks (index) {
-        index -> Int8,
+        index -> Uuid,
+        prev_index -> Nullable<Uuid>,
         data -> Text,
         hash -> Text,
-        prev_hash -> Text,
+        prev_hash -> Nullable<Text>,
         created_at -> Timestamp,
-        update_at -> Timestamp,
+        updated_at -> Timestamp,
         deleted_at -> Nullable<Timestamp>,
     }
 }
