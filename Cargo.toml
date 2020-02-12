@@ -8,3 +8,18 @@ edition = "2018"
 
 [dependencies]
 rocket = "0.4.2"
+dotenv = "0.15.0"
+diesel = { version = "1.4.2", features = ["postgres", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+serde = "1.0.104"
+serde_json  = "1.0.44"
+juniper_rocket = "0.5.2"
+
+[dependencies.rocket_contrib]
+version = "0.4.2"
+default-features = false
+features = ["json", "diesel_postgres_pool"]
+
+[dependencies.juniper]
+version = "0.14.2"
+features = ["serde_json", "chrono"]
