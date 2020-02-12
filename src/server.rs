@@ -1,16 +1,13 @@
 use crate::config;
+use crate::graphql::{Mutations, Query, Schema};
 use crate::handler;
+use crate::storage;
 
 use rocket::config::{Config, Environment, Value};
 use std::collections::HashMap;
 
 pub struct Server {
     config: Config,
-}
-
-#[get("/")]
-pub fn ping() -> String {
-    "hello world".to_owned()
 }
 
 impl Server {
@@ -31,6 +28,13 @@ impl Server {
     }
 
     pub fn init(self) -> rocket::Rocket {
-        rocket::custom(self.config).mount("/ping", routes![handler::ping])
+        rocket::custom(self.config)
+            .attach(storage::DbConn::fairing())
+            .manage(Schema::new(Query, Mutations))
+            .mount("/ping", routes![handler::ping::ping])
+            .mount(
+                "/graphql",
+                routes![handler::graphql::graphql, handler::graphql::graphiql],
+            )
     }
 }

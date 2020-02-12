@@ -1,4 +1,5 @@
 extern crate diesel;
+pub mod domain;
 pub mod schema;
 
 use diesel::pg::PgConnection;
