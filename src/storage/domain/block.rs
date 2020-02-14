@@ -12,7 +12,7 @@ use serde_json::json;
 use std::io::Read;
 use uuid::Uuid;
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug)]
 pub struct Block {
     pub index: Uuid,
     pub prev_index: Option<Uuid>,
@@ -45,15 +45,14 @@ impl Block {
             Some(block) => (Some(block.index), Some(block.hash)),
             None => (None, None),
         };
-
         let curr_id = uuid::Uuid::new_v4();
 
         let json_data = json!({
             "index": curr_id.to_string(),
             "data": new_block.data,
             "prev_hash": _prev_hash,
-            "created_at": now,
-            "updated_at": now
+            "created_at": now.timestamp(),
+            "updated_at": now.timestamp()
         });
 
         let digest = sha256_digest(json_data.to_string().as_bytes());
@@ -61,7 +60,7 @@ impl Block {
 
         diesel::insert_into(blocks)
             .values((
-                index.eq(uuid::Uuid::new_v4()),
+                index.eq(curr_id),
                 prev_index.eq(prev_id),
                 data.eq(new_block.data),
                 prev_hash.eq(_prev_hash.as_ref()),
@@ -80,6 +79,53 @@ impl Block {
             .offset(_offset)
             .load::<Block>(&**db)
             .optional()
+    }
+
+    pub fn get_by_id(db: &DbConn, _index: Uuid) -> Result<Option<Block>, DBError> {
+        use crate::storage::schema::blocks::dsl::*;
+        blocks.find(_index).first::<Block>(&**db).optional()
+    }
+
+    pub fn verify(db: &DbConn) -> Result<bool, DBError> {
+        let mut is_valid = true;
+
+        use crate::storage::schema::blocks::dsl::*;
+        let block_list = blocks.order_by(created_at.desc()).load::<Block>(&**db)?;
+
+        let mut i: usize = 0;
+        let mut curr_block = &block_list[i];
+        i += 1;
+        loop {
+            if i == block_list.len() || curr_block.prev_index == None {
+                break;
+            }
+
+            let prev_block = &block_list[i];
+
+            let json_data = json!({
+                "index": curr_block.index.to_string(),
+                "data": curr_block.data,
+                "prev_hash": prev_block.hash,
+                "created_at": curr_block.created_at.timestamp(),
+                "updated_at": curr_block.updated_at.timestamp()
+            });
+
+            let digest = sha256_digest(json_data.to_string().as_bytes());
+            let hashed_data = HEXUPPER.encode(digest.as_ref());
+
+            if prev_block.hash != curr_block.prev_hash.clone().unwrap()
+                || curr_block.hash != hashed_data
+            {
+                println!("masuk");
+                is_valid = false;
+                break;
+            }
+
+            curr_block = &block_list[i];
+            i += 1;
+        }
+
+        Ok(is_valid)
     }
 }
 

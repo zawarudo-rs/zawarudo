@@ -3,5 +3,5 @@ pub fn port() -> String {
 }
 
 pub fn database_url() -> String {
-    "postgres://postgres:secret@localhost/secretdb".to_owned()
+    "postgres://postgres:secret@localhost/pgblockchain".to_owned()
 }
