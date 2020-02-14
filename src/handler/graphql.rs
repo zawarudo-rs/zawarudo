@@ -14,5 +14,5 @@ pub fn graphql(
 
 #[rocket::get("/")]
 pub fn graphiql() -> content::Html<String> {
-    juniper_rocket::playground_source("/")
+    juniper_rocket::playground_source("/graphql")
 }
