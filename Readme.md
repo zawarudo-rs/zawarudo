@@ -33,14 +33,14 @@ or just open `localhost:PORT/graphql` in your browser it will open a graphql pla
 ### Example Query
 
 ```graphql
-// hello world query
+# hello world query
 {
    helloWorld
 }
 ```
 
-```
-// get last 10 block
+```graphql
+# get last 10 block
 {
    getAllBlock(limit: 10, offset: 0) {
       index
@@ -53,8 +53,8 @@ or just open `localhost:PORT/graphql` in your browser it will open a graphql pla
 }
 ```
 
-```
-// recursive query
+```graphql
+# recursive query
 {
    getAllBlock(limit: 10, offset: 0) {
       index
@@ -67,8 +67,8 @@ or just open `localhost:PORT/graphql` in your browser it will open a graphql pla
 }
 ```
 
-```
-// block creation
+```graphql
+# block creation
 mutation {
    createNewBlock(data: "some message here") {
       data
@@ -79,8 +79,8 @@ mutation {
 }
 ```
 
-```
-// verify blockchain
+```graphql
+# verify blockchain
 {
   verifyAllBlock
 }
