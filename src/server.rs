@@ -20,6 +20,7 @@ impl Server {
 
         let config = Config::build(Environment::Development)
             .port(config::port().parse().unwrap())
+            .address("0.0.0.0")
             .extra("databases", databases)
             .finalize()
             .unwrap();
